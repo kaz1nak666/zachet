@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Требования к сдаче экзамена - Каталог личной библиотеки</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="document-container">
+            <h1>ТРЕБОВАНИЯ К СДАЧЕ ЭКЗАМЕНА: Каталог личной библиотеки</h1>
+
+            <p>
+                <strong>Цель работы:</strong> Развернуть отказоустойчивую инфраструктуру для REST API, 
+                настроить процессы непрерывной интеграции (CI) и обеспечить безопасность хранения конфигурационных данных.
+            </p>
+
+            <div class="hint">
+                <strong>ВАЖНО:</strong> Проект должен быть полностью автоматизирован. 
+                Любые ручные манипуляции с базой данных или кодом после деплоя должны быть исключены.
+            </div>
+
+            <hr class="separator" />
+
+            <h2>ШАГ 1: ОРКЕСТРАЦИЯ (DOCKER COMPOSE)</h2>
+            <p>
+                Настройте совместный запуск приложения и базы данных, используя <code>docker-compose.yml</code>.
+            </p>
+            <ol>
+                <li>
+                    <strong>Сервис БД:</strong> Добавьте сервис <code>db</code>. Используйте официальный образ (например, <code>postgres:15-alpine</code>).
+                </li>
+                <li>
+                    <strong>Связь сервисов:</strong> Настройте API-сервис так, чтобы он зависел от готовности базы данных (используйте <code>healthcheck</code> и <code>depends_on</code> с условием <code>service_healthy</code>).
+                </li>
+                <li>
+                    <strong>Конфигурация:</strong> Все параметры подключения (логин, пароль, имя БД) должны передаваться через переменные окружения, подгружаемые из файла <code>.env</code>.
+                </li>
+            </ol>
+
+            <hr class="separator" />
+
+            <h2>ШАГ 2: УПРАВЛЕНИЕ РЕПОЗИТОРИЕМ И ВЕТКАМИ</h2>
+            <p>
+                Соблюдение методологии ветвления — критический аспект командной разработки.
+            </p>
+            <ol>
+                <li>
+                    <strong>Публикация:</strong> Выложите исходный код проекта на <code>GitHub</code>.
+                </li>
+                <li>
+                    <strong>Структура веток:</strong>
+                    <ul>
+                        <li><code>main</code> — стабильная версия (production).</li>
+                        <li><code>dev</code> — ветка для разработки и тестирования (staging).</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Branch Protection (Защита веток):</strong>
+                    <p>Настройте правила для обеих веток в интерфейсе GitHub:</p>
+                    <ul>
+                        <li>Запрет прямых пушей (<code>Restrict pushes</code>).</li>
+                        <li>Обязательное создание Pull Request для внесения изменений.</li>
+                        <li>Обязательное успешное прохождение всех <code>CI-проверок</code> перед мерджем.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <hr class="separator" />
+
+            <h2>ШАГ 3: НЕПРЕРЫВНАЯ ИНТЕГРАЦИЯ (CI)</h2>
+            <p>
+                Настройте автоматизацию проверок с помощью <code>GitHub Actions</code>.
+            </p>
+            <div class="hint">
+                Пайплайн должен запускаться автоматически при каждом <code>push</code> или <code>Pull Request</code>, 
+                направленном в ветки <code>main</code> или <code>dev</code>.
+            </div>
+            <p><strong>Этапы пайплайна:</strong></p>
+            <ol>
+                <li>
+                    <strong>Линтинг:</strong> Проверка качества кода и соответствие стандартам (используйте <code>ruff</code>).
+                </li>
+                <li>
+                    <strong>Тестирование:</strong> Запуск Unit и Integration тестов (<code>pytest</code>).
+                </li>
+                <li>
+                    <strong>Сборка:</strong> Проверка собираемости Docker-образа (<code>docker build</code>).
+                </li>
+            </ol>
+
+            <hr class="separator" />
+
+            <h2>ШАГ 4: БЕЗОПАСНОСТЬ</h2>
+            <p>
+                Защита чувствительных данных — приоритет №1.
+            </p>
+            <ol>
+                <li>
+                    <strong>Исключение файлов:</strong> Настройте <code>.gitignore</code>. 
+                    В репозитории не должно быть временных файлов, кэша Python и виртуальных окружений.
+                </li>
+                <li>
+                    <strong>Секреты:</strong> Файл <code>.env</code> с реальными паролями <strong>категорически запрещено</strong> коммитить в репозиторий. Он должен быть добавлен в <code>.gitignore</code>.
+                </li>
+                <li>
+                    <strong>Шаблон настроек:</strong> Для удобства других разработчиков создайте файл <code>.env.example</code> с перечислением необходимых переменных, но без секретных значений.
+                </li>
+            </ol>
+
+            <hr class="separator" />
+
+            <h2>ИТОГОВЫЙ ЗАПУСК</h2>
+            <p>
+                Проверка работоспособности осуществляется командой:
+            </p>
+            <pre><code>docker compose up -d --build</code></pre>
+        </div>
+    </body>
+</html>
