@@ -46,7 +46,7 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         run: |
-          pytest tests/ -v
+          pytest tests/ -v --tb=short
       
       - name: Run linter
         run: |
