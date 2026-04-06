@@ -14,4 +14,9 @@ app.include_router(books.router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Personal Library API"}
+    # 🔥 ИЗМЕНЕНИЕ ДЛЯ ТЕСТА ДЕПЛОЯ:
+    return {"message": "Kaz1nakProject v2.0 - AUTO-DEPLOYED! 🚀✅"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "deployed_by": "GitHub Actions + Self-Hosted Runner"}
