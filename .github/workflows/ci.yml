@@ -45,8 +45,9 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          pytest tests/ -v --tb=short
+          python -m pytest tests/ -v --tb=short
       
       - name: Run linter
         run: |
