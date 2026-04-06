@@ -32,21 +32,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Create .env file
-        run: |
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "Создан .env файл"
       
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-asyncio httpx
-
+      
+      # 🔥 ШАГ 3: Передаём секреты в тесты через env
       - name: Run tests
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -57,12 +50,24 @@ jobs:
         run: |
           python -m pytest tests/ -v --tb=short
       
+      # 🔥 ШАГ 4: Передаём секреты в Docker Compose (без .env файла!)
+      - name: Run Docker Compose (if needed)
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "Docker Compose step - secrets passed via env"
+          # docker compose up -d  # раскомментируй, если нужно
+      
+      # 🔥 ШАГ 5: Проверка маскировки секретов
+      - name: Check secret masking
+        run: |
+          echo "Password in logs: ${{ secrets.POSTGRES_PASSWORD }}"
+          # В логах будет: Password in logs: ***
+      
       - name: Run linter
         run: |
           pip install ruff
           ruff check .
-      
-      - name: Check secret masking
-        run: |
-          echo "Testing secret masking: ${{ secrets.POSTGRES_PASSWORD }}"
-          # В логах будет *** вместо пароля
