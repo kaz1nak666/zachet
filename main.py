@@ -14,7 +14,6 @@ app.include_router(books.router)
 
 @app.get("/")
 def read_root():
-    # 🔥 ИЗМЕНЕНИЕ ДЛЯ ТЕСТА ДЕПЛОЯ:
     return {"message": "Kaz1nakProject v2.0 - AUTO-DEPLOYED! 🚀✅"}
 
 @app.get("/health")
