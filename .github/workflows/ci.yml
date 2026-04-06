@@ -39,6 +39,7 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-asyncio httpx
       
+      # 🔥 ШАГ 3: Передаём секреты в тесты через env
       - name: Run tests
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -48,6 +49,23 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
         run: |
           python -m pytest tests/ -v --tb=short
+      
+      # 🔥 ШАГ 4: Передаём секреты в Docker Compose (без .env файла!)
+      - name: Run Docker Compose (if needed)
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "Docker Compose step - secrets passed via env"
+          # docker compose up -d  # раскомментируй, если нужно
+      
+      # 🔥 ШАГ 5: Проверка маскировки секретов
+      - name: Check secret masking
+        run: |
+          echo "Password in logs: ${{ secrets.POSTGRES_PASSWORD }}"
+          # В логах будет: Password in logs: ***
       
       - name: Run linter
         run: |
